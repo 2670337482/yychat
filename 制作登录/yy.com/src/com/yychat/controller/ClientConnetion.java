@@ -5,12 +5,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashMap;
 
 import yychat.model.Message;
 import yychat.model.User;
 
 public class ClientConnetion {
-     public static Socket s;//静态成员变量
+     public  Socket s;//静态成员变量
+     public static HashMap hmSocket=new HashMap<String,Socket>();
+     
 	public ClientConnetion(){
 	
 	try {//异常处理
@@ -31,6 +34,11 @@ public class ClientConnetion {
 		    
 		    ObjectInputStream ois=new ObjectInputStream(s.getInputStream());
 		    mess=(Message)ois.readObject();
+		    
+		    if(mess.getMessageType().equals("1")){
+		    	hmSocket.put(user.getUserName(), s);
+		    	new ClientReceiverThread(s).start();
+		    }
 		    
 	    } catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
